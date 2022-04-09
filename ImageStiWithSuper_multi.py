@@ -115,8 +115,7 @@ def main(opt,name0,name1,matches_path,viz_path):
         # Write the matches to disk.
         out_matches = {'keypoints0': kpts0, 'keypoints1': kpts1,
                         'matches': matches, 'match_confidence': conf}
-        # pdb.set_trace()
-        # np.savez(str(matches_path), **out_matches)
+        
         xy_F = kpts0 #特征点坐标
         xy_L = kpts1
         confidence = conf   #置信度
@@ -130,30 +129,29 @@ def main(opt,name0,name1,matches_path,viz_path):
                 PtsB.append(xy_L[Match[i]])
         PtsA = np.float32(PtsA)
         PtsB = np.float32(PtsB)
-        # pdb.set_trace()
         Mat, status = cv2.findHomography(PtsB, PtsA, cv2.RANSAC, 4)
         # show_Image_Cv(image1_color)
-        # pdb.set_trace()
         warpImg = cv2.warpPerspective(image1_color, Mat, (image0_color.shape[1],int(image0_color.shape[0]+image1_color.shape[0])))
         # show_Image_Cv(warpImg)
         direct=warpImg.copy()
         direct[0:image0_color.shape[0], 0:image0_color.shape[1]] = image0_color
 
+        # 平滑处理
         rows,cols=image0_color.shape[:2]
         # drawMatches(image0, image1, PtsA, PtsB, Match, status)
         for row in range(0,rows):
-            if image0_color[row, :].any() and warpImg[row, :].any():#开始重叠的最左端
+            if image0_color[row, :].any() and warpImg[row, :].any():
                 top = row
                 break
         for row in range(rows-1, 0, -1):
-            if image0_color[row, :].any() and warpImg[row, :].any():#重叠的最右一列
+            if image0_color[row, :].any() and warpImg[row, :].any():
                 bot = row
                 break    
 
         res = np.zeros([rows, cols, 3], np.uint8)
         for col in range(0, cols):
             for row in range(0, rows):
-                if not image0_color[row, col].any():#如果没有原图，用旋转的填充
+                if not image0_color[row, col].any():
                     res[row, col] = warpImg[row, col]
                 elif not warpImg[row, col].any():
                     res[row, col] = image0_color[row, col]
@@ -164,15 +162,8 @@ def main(opt,name0,name1,matches_path,viz_path):
                     res[row, col] = np.clip(image0_color[row, col] * (1-alpha) + warpImg[row, col] * alpha, 0, 255)
 
         warpImg[0:image0_color.shape[0], 0:image0_color.shape[1]]=res
-        # flag = 1
-        # for i,x in enumerate(warpImg):
-        #     if flag:
-        #         for j,y in enumerate(x):
-        #             if (y!=np.array([0,0,0])).all():
-        #                 break
-        #             flag = 0
-        #     else:
-        #         break
+        
+        # 去除黑色部分
         flag = 1
         h_warp,w_warp = warpImg.shape[0:2]
         for col in range(h_warp-1,0,-1):
@@ -314,10 +305,7 @@ if __name__ == '__main__':
 
     with open(opt.input_pairs, 'r') as f:
         pairs = [l.split() for l in f.readlines()]
-
-    # if opt.max_length0 > -1:
-    #     pairs = pairs[0:np.min([len(pairs), opt.max_length])]
-
+        
     if opt.shuffle:
         random.Random(0).shuffle(pairs)
 
