@@ -1,6 +1,6 @@
 # ImageStitchingWithSuper
 ## Introduction
-An longitudinal image stitching solution with SuperPoint(https://arxiv.org/abs/1712.07629) and SuperGlue(https://arxiv.org/abs/1911.11763)
+A longitudinal image stitching solution with SuperPoint(https://arxiv.org/abs/1712.07629) and SuperGlue(https://arxiv.org/abs/1911.11763)
 
 ## Contents
 `demo_superglue.py` : runs a live demo on a webcam, IP camera, image directory or movie file
