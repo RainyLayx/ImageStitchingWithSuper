@@ -8,8 +8,6 @@ with open(txt, 'w') as f:
     for fname in os.listdir(path):
         if '.jpg' in fname or '.png' in fname:
             print(fname)
-            # pdb.set_trace()
-            # fname = os.path.basename(file)
             if not contrast:#第一个文件
                 m = fname + ' '
                 contrast = fname
@@ -23,5 +21,4 @@ with open(txt, 'w') as f:
                     print(m)
                     m = fname + ' '
                     contrast = fname
-    # m = m + fname + ' '
     f.write(m)
