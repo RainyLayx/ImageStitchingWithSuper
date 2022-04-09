@@ -46,28 +46,28 @@ for i in os.listdir(npz_dir):
                 PtsB.append(xy_L[Match[i]])
         PtsA = np.float32(PtsA)
         PtsB = np.float32(PtsB)
-        # pdb.set_trace()
         Mat, status = cv2.findHomography(PtsB, PtsA, cv2.RANSAC, 4)
 
         warpImg = cv2.warpPerspective(img2, Mat, (img1.shape[1],int(img1.shape[0]+img2.shape[0])))
         direct=warpImg.copy()
         direct[0:img1.shape[0], 0:img1.shape[1]] = img1
-
+        
+        # 平滑处理
         rows,cols=img1.shape[:2]
         # drawMatches(img1, img2, PtsA, PtsB, Match, status)
         for row in range(0,rows):
-            if img1[row, :].any() and warpImg[row, :].any():#开始重叠的最左端
+            if img1[row, :].any() and warpImg[row, :].any():#最上一行
                 top = row
                 break
         for row in range(rows-1, 0, -1):
-            if img1[row, :].any() and warpImg[row, :].any():#重叠的最右一列
+            if img1[row, :].any() and warpImg[row, :].any():#最下一行
                 bot = row
                 break
 
         res = np.zeros([rows, cols, 3], np.uint8)
         for col in range(0, cols):
             for row in range(0, rows):
-                if not img1[row, col].any():#如果没有原图，用旋转的填充
+                if not img1[row, col].any():
                     res[row, col] = warpImg[row, col]
                 elif not warpImg[row, col].any():
                     res[row, col] = img1[row, col]
@@ -80,4 +80,3 @@ for i in os.listdir(npz_dir):
         warpImg[0:img1.shape[0], 0:img1.shape[1]]=res
         cv2.imwrite(os.path.join('./testdir/',name+'.jpg'),warpImg)
         # show_Image_Cv(direct)
-        # pdb.set_trace()
